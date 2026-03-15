@@ -14,8 +14,6 @@
 
   // ===== Init =====
   function init() {
-    initAdminMap();
-
     const saved = sessionStorage.getItem('icml_gh');
     if (saved) {
       gh = JSON.parse(saved);
@@ -29,6 +27,18 @@
     document.getElementById('cafe-form').addEventListener('submit', handleSave);
     document.getElementById('cancel-form-btn').addEventListener('click', closeForm);
     document.getElementById('delete-cafe-btn').addEventListener('click', handleDelete);
+
+    // Locate button
+    document.getElementById('admin-locate-btn').addEventListener('click', () => {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        adminMap.setView([latitude, longitude], 14);
+        L.circleMarker([latitude, longitude], {
+          radius: 8, color: '#e05a4a', fillColor: '#e05a4a', fillOpacity: 0.9, weight: 2
+        }).addTo(adminMap).bindPopup('Current location').openPopup();
+      });
+    });
 
     // Photo upload
     const uploadArea = document.getElementById('photo-upload-area');
@@ -94,9 +104,11 @@
     document.getElementById('editor-section').classList.remove('hidden');
     await loadCafes();
     renderAdminList();
-    showAllMarkers();
-    // Re-invalidate map size after layout change
-    setTimeout(() => adminMap.invalidateSize(), 200);
+    // Init map after the split layout is visible
+    setTimeout(() => {
+      initAdminMap();
+      showAllMarkers();
+    }, 100);
   }
 
   // ===== GitHub API helpers =====
