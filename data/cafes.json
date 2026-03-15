@@ -28,7 +28,9 @@
     "rating": 1,
     "musicRating": 5,
     "studyRating": 1,
-    "tags": [],
+    "tags": [
+      "웨스턴 일렉트릭"
+    ],
     "photos": [
       "images/3c7a4743/1773565472732_l1bw.jpeg"
     ]
