@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICML Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1><a href="index.html">ICML</a> <span class="admin-badge">Admin</span></h1>
+  </header>
+
+  <main>
+    <!-- Login -->
+    <section id="login-section" class="admin-section">
+      <h2>GitHub 로그인</h2>
+      <p>저장소에 데이터를 커밋하려면 GitHub Personal Access Token이 필요합니다.</p>
+      <div class="form-group">
+        <label for="gh-owner">GitHub Owner</label>
+        <input type="text" id="gh-owner" placeholder="username">
+      </div>
+      <div class="form-group">
+        <label for="gh-repo">Repository</label>
+        <input type="text" id="gh-repo" value="icml">
+      </div>
+      <div class="form-group">
+        <label for="gh-token">Personal Access Token</label>
+        <input type="password" id="gh-token" placeholder="ghp_...">
+      </div>
+      <button id="login-btn" class="btn btn-primary">로그인</button>
+    </section>
+
+    <!-- Editor (hidden until login) -->
+    <section id="editor-section" class="admin-section hidden">
+      <h2>카페 목록</h2>
+      <button id="add-cafe-btn" class="btn btn-primary">+ 새 카페 추가</button>
+      <div id="admin-cafe-list" class="cafe-grid"></div>
+
+      <!-- Cafe form modal -->
+      <div id="cafe-form-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content modal-wide">
+          <button class="modal-close" aria-label="Close">&times;</button>
+          <h2 id="form-title">새 카페 추가</h2>
+          <form id="cafe-form">
+            <input type="hidden" id="cafe-id">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cafe-name">이름 (English)</label>
+                <input type="text" id="cafe-name" required>
+              </div>
+              <div class="form-group">
+                <label for="cafe-name-kr">이름 (한국어)</label>
+                <input type="text" id="cafe-name-kr">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cafe-address">주소</label>
+              <input type="text" id="cafe-address">
+            </div>
+            <div class="form-group">
+              <label>위치 (지도를 클릭하세요)</label>
+              <div id="admin-map" style="height:300px;border-radius:8px;"></div>
+              <small id="coords-display">선택된 좌표: 없음</small>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cafe-date">방문 날짜</label>
+                <input type="date" id="cafe-date" required>
+              </div>
+              <div class="form-group">
+                <label for="cafe-rating">전체 별점 (1-5)</label>
+                <input type="number" id="cafe-rating" min="1" max="5" step="0.5" required>
+              </div>
+              <div class="form-group">
+                <label for="cafe-music-rating">음악 별점 (1-5)</label>
+                <input type="number" id="cafe-music-rating" min="1" max="5" step="0.5">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cafe-tags">태그 (쉼표로 구분)</label>
+              <input type="text" id="cafe-tags" placeholder="jazz, vinyl, quiet, good-for-reading">
+            </div>
+            <div class="form-group">
+              <label for="cafe-description">설명 / 메모</label>
+              <textarea id="cafe-description" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="cafe-photos">사진 업로드</label>
+              <input type="file" id="cafe-photos" accept="image/*" multiple>
+              <div id="photo-preview" class="photo-preview"></div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">저장</button>
+              <button type="button" id="delete-cafe-btn" class="btn btn-danger hidden">삭제</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

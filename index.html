@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICML — Is Coffee My Life?</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>ICML</h1>
+    <p class="subtitle">Is Coffee My Life?</p>
+  </header>
+
+  <main>
+    <!-- Controls -->
+    <section class="controls">
+      <input type="text" id="search" placeholder="카페 이름 검색..." aria-label="Search cafes">
+      <select id="tag-filter" aria-label="Filter by tag">
+        <option value="">모든 태그</option>
+      </select>
+      <select id="sort-by" aria-label="Sort by">
+        <option value="date-desc">최신순</option>
+        <option value="date-asc">오래된순</option>
+        <option value="rating-desc">별점 높은순</option>
+        <option value="rating-asc">별점 낮은순</option>
+      </select>
+    </section>
+
+    <!-- Map -->
+    <section class="map-container">
+      <div id="map"></div>
+    </section>
+
+    <!-- Cafe grid -->
+    <section id="cafe-grid" class="cafe-grid"></section>
+  </main>
+
+  <!-- Cafe detail modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; ICML</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
