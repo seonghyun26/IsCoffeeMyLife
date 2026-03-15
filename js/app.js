@@ -56,27 +56,27 @@
     });
   }
 
-  function cafePopupHtml(cafe) {
+  function cafeTooltipHtml(cafe) {
     const img = cafe.photos?.length
-      ? `<img src="${cafe.photos[0]}" style="width:100%;height:80px;object-fit:cover;display:block;margin-bottom:6px;">`
+      ? `<img src="${cafe.photos[0]}" style="width:140px;height:80px;object-fit:cover;display:block;margin-bottom:4px;">`
       : '';
-    const stars = cafe.rating ? `<span style="color:#e8b84a;">${renderStars(cafe.rating)}</span> ` : '';
-    return `<div style="min-width:140px;font-family:inherit;">${img}<strong style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.03em;">${cafe.name}</strong><br><span style="font-size:0.75rem;color:#6b6560;">${stars}${cafe.visitDate || ''}</span></div>`;
+    return `<div style="min-width:140px;">${img}<strong style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.03em;">${cafe.name}</strong></div>`;
   }
 
   function addMarkers(list) {
     markers.forEach(m => map.removeLayer(m));
     markers = [];
+    const dotColors = ['#e05a4a', '#4a8ab5', '#e8b84a'];
     list.forEach(cafe => {
       if (!cafe.lat || !cafe.lng) return;
       const isFeatured = featuredIds.has(cafe.id);
-      const dotColors = ['#e05a4a', '#4a8ab5', '#e8b84a'];
       const marker = isFeatured
         ? L.marker([cafe.lat, cafe.lng], { icon: cafePin('#e05a4a'), zIndexOffset: 100 })
         : L.circleMarker([cafe.lat, cafe.lng], {
             radius: 6, color: '#fff', fillColor: dotColors[markers.length % 3], fillOpacity: 0.8, weight: 2
           });
-      marker.addTo(map).bindPopup(cafePopupHtml(cafe), { maxWidth: 200 });
+      marker.addTo(map);
+      marker.bindTooltip(cafeTooltipHtml(cafe), { direction: 'top', offset: isFeatured ? [0, -36] : [0, -8], opacity: 1, className: 'cafe-tooltip' });
       marker.on('click', () => openDetail(cafe));
       markers.push(marker);
     });
@@ -97,16 +97,13 @@
       const thumb = cafe.photos && cafe.photos.length
         ? `<img src="${cafe.photos[0]}" alt="${cafe.name}" loading="lazy">`
         : '<div class="no-photo">☕</div>';
-      const stars = renderStars(cafe.rating);
       const tags = (cafe.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
       return `
         <div class="cafe-card" data-id="${cafe.id}">
           ${thumb}
           <div class="card-body">
             <h3>${cafe.name}</h3>
-            <div class="card-meta">
-              <span class="stars">${stars}</span> ${cafe.rating || ''} &middot; ${cafe.visitDate || ''}
-            </div>
+            <div class="card-meta">${cafe.visitDate || ''}</div>
             <div class="tags">${tags}</div>
           </div>
         </div>`;
@@ -143,9 +140,9 @@
       <div class="detail-info">
         <h2>${cafe.name}</h2>
         ${cafe.nameKr ? `<p class="kr-name">${cafe.nameKr}</p>` : ''}
-        <p><span class="stars">${renderStars(cafe.rating)}</span> ${cafe.rating || '-'} / 5
-          ${cafe.musicRating ? ` &middot; Music ${renderStars(cafe.musicRating)} ${cafe.musicRating}` : ''}</p>
-        <p>📅 ${cafe.visitDate || '-'}</p>
+        ${cafe.rating ? `<p>☕ <span class="stars">${renderStars(cafe.rating)}</span> ${cafe.rating}/5</p>` : ''}
+        ${cafe.musicRating ? `<p>♫ <span class="stars">${renderStars(cafe.musicRating)}</span> ${cafe.musicRating}/5</p>` : ''}
+        ${cafe.studyRating ? `<p>✍ <span class="stars">${renderStars(cafe.studyRating)}</span> ${cafe.studyRating}/5</p>` : ''}
         ${cafe.address ? `<p>📍 ${cafe.address}</p>` : ''}
         ${cafe.description ? `<p>${cafe.description}</p>` : ''}
         <div class="tags">${(cafe.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
@@ -168,14 +165,18 @@
 
   function buildMapLinks(cafe) {
     const hasCoords = cafe.lat && cafe.lng;
-    const naver = cafe.naverLink
-      ? `<a href="${cafe.naverLink}" target="_blank" rel="noopener" class="link-naver">Naver</a>`
+    const naverUrl = cafe.naverLink || null;
+    const kakaoUrl = cafe.kakaoLink || null;
+    const googleUrl = cafe.googleLink || null;
+
+    const naver = naverUrl
+      ? `<a href="${naverUrl}" target="_blank" rel="noopener" class="link-naver">Naver</a>`
       : `<span class="link-disabled">Naver</span>`;
-    const kakao = hasCoords
-      ? `<a href="https://map.kakao.com/link/map/${encodeURIComponent(cafe.nameKr || cafe.name)},${cafe.lat},${cafe.lng}" target="_blank" rel="noopener" class="link-kakao">Kakao</a>`
+    const kakao = kakaoUrl
+      ? `<a href="${kakaoUrl}" target="_blank" rel="noopener" class="link-kakao">Kakao</a>`
       : `<span class="link-disabled">Kakao</span>`;
-    const google = hasCoords
-      ? `<a href="https://www.google.com/maps/search/?api=1&query=${cafe.lat},${cafe.lng}" target="_blank" rel="noopener" class="link-google">Google</a>`
+    const google = googleUrl
+      ? `<a href="${googleUrl}" target="_blank" rel="noopener" class="link-google">Google</a>`
       : `<span class="link-disabled">Google</span>`;
     return naver + kakao + google;
   }

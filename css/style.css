@@ -88,6 +88,16 @@ a:hover { text-decoration: underline; }
   margin-top: 0.4rem;
 }
 
+/* Leaflet tooltip for cafe pins */
+.cafe-tooltip {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  font-family: inherit;
+}
+.cafe-tooltip .leaflet-tooltip-content { padding: 0.4rem; }
+
 /* Fix Leaflet divIcon default box */
 .leaflet-div-icon { background: none; border: none; }
 
@@ -287,12 +297,14 @@ a:hover { text-decoration: underline; }
 .detail-links .link-kakao:hover { background: #e6cf00; }
 .detail-links .link-google {
   background: #fff;
+  color: transparent;
   background-image: linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  border: 1px solid #eee;
 }
-.detail-links .link-google:hover { opacity: 0.85; }
+.detail-links .link-google:hover { opacity: 0.8; }
 .detail-links .link-disabled {
   font-size: 0.8rem;
   font-weight: 700;

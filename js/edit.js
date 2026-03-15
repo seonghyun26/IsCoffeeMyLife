@@ -102,6 +102,8 @@
     document.getElementById('cafe-id').value = cafe.id;
     document.getElementById('cafe-name').value = cafe.name || '';
     document.getElementById('cafe-naver-link').value = cafe.naverLink || '';
+    document.getElementById('cafe-kakao-link').value = cafe.kakaoLink || '';
+    document.getElementById('cafe-google-link').value = cafe.googleLink || '';
     document.getElementById('cafe-date').value = cafe.visitDate || '';
     document.getElementById('cafe-tags').value = (cafe.tags || []).join(', ');
     document.getElementById('cafe-description').value = cafe.description || '';
@@ -200,6 +202,8 @@
         id,
         name: document.getElementById('cafe-name').value.trim(),
         naverLink: document.getElementById('cafe-naver-link').value.trim() || undefined,
+        kakaoLink: document.getElementById('cafe-kakao-link').value.trim() || undefined,
+        googleLink: document.getElementById('cafe-google-link').value.trim() || undefined,
         lat: selectedLat,
         lng: selectedLng,
         visitDate: document.getElementById('cafe-date').value,
