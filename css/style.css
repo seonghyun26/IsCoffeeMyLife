@@ -405,6 +405,20 @@ a:hover { text-decoration: underline; }
   background: var(--bh-red);
   color: var(--bh-white);
 }
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-link:hover {
+  color: var(--bh-red);
+}
 .btn-icon {
   width: 2.4rem;
   height: 2.4rem;

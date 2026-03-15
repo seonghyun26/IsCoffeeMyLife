@@ -27,6 +27,7 @@
     document.getElementById('cafe-form').addEventListener('submit', handleSave);
     document.getElementById('cancel-form-btn').addEventListener('click', closeForm);
     document.getElementById('delete-cafe-btn').addEventListener('click', handleDelete);
+    document.getElementById('logout-btn').addEventListener('click', handleLogout);
 
     // Locate button
     document.getElementById('admin-locate-btn').addEventListener('click', () => {
@@ -445,6 +446,17 @@
     } catch (err) {
       alert('Delete failed: ' + err.message);
     }
+  }
+
+  // ===== Logout =====
+  function handleLogout() {
+    sessionStorage.removeItem('icml_gh');
+    gh = { owner: '', repo: '', token: '' };
+    cafes = [];
+    document.getElementById('admin-header').classList.add('hidden');
+    document.getElementById('editor-section').classList.add('hidden');
+    document.getElementById('login-section').classList.remove('hidden');
+    if (adminMap) { adminMap.remove(); adminMap = null; }
   }
 
   // ===== Utils =====
