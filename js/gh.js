@@ -47,5 +47,10 @@ const icmlGh = (function () {
     return res.json();
   }
 
-  return { api, loadCafes, commitFile };
+  function imageUrl(path) {
+    if (!path || path.startsWith('http')) return path;
+    return `https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/main/${path}`;
+  }
+
+  return { api, loadCafes, commitFile, imageUrl };
 })();

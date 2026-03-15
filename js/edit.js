@@ -156,7 +156,7 @@
     const container = document.getElementById('photo-preview');
     const thumbs = existingPhotos.map((url, i) =>
       `<div class="photo-thumb">
-        <img src="${url}" alt="photo">
+        <img src="${icmlGh.imageUrl(url)}" alt="photo">
         <button type="button" class="photo-remove" data-type="existing" data-index="${i}">&times;</button>
       </div>`
     ).concat(pendingPhotos.map((p, i) =>

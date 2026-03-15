@@ -11,9 +11,9 @@
   // ===== Init =====
   async function init() {
     await loadCafes();
+    pickFeatured();
     initMap();
-    renderFeatured();
-    renderCafes(cafes);
+    renderCafes(getFeatured());
     populateTagFilter();
     bindControls();
   }
@@ -27,33 +27,13 @@
     }
   }
 
-  // ===== Featured =====
-  function renderFeatured() {
-    const section = document.getElementById('featured');
-    if (!cafes.length) return;
+  function pickFeatured() {
     const shuffled = [...cafes].sort(() => Math.random() - 0.5).slice(0, 10);
     featuredIds = new Set(shuffled.map(c => c.id));
-    section.innerHTML = shuffled.map(cafe => {
-      const bg = cafe.photos?.length
-        ? `<img src="${cafe.photos[0]}" alt="${cafe.name}" loading="lazy">`
-        : '<span class="featured-icon">☕</span>';
-      return `<div class="featured-item" data-id="${cafe.id}">${bg}<span class="featured-name">${cafe.name}</span></div>`;
-    }).join('');
-    section.querySelectorAll('.featured-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const cafe = cafes.find(c => c.id === item.dataset.id);
-        if (!cafe) return;
-        if (cafe.lat && cafe.lng) {
-          map.setView([cafe.lat, cafe.lng], 15);
-          const marker = markers.find(m => {
-            const ll = m.getLatLng();
-            return ll.lat === cafe.lat && ll.lng === cafe.lng;
-          });
-          if (marker) marker.openPopup();
-        }
-        openDetail(cafe);
-      });
-    });
+  }
+
+  function getFeatured() {
+    return cafes.filter(c => featuredIds.has(c.id));
   }
 
   // ===== Map =====
@@ -90,10 +70,11 @@
     list.forEach(cafe => {
       if (!cafe.lat || !cafe.lng) return;
       const isFeatured = featuredIds.has(cafe.id);
+      const dotColors = ['#e05a4a', '#4a8ab5', '#e8b84a'];
       const marker = isFeatured
         ? L.marker([cafe.lat, cafe.lng], { icon: cafePin('#e05a4a'), zIndexOffset: 100 })
         : L.circleMarker([cafe.lat, cafe.lng], {
-            radius: 5, color: '#999', fillColor: '#999', fillOpacity: 0.6, weight: 1
+            radius: 6, color: '#fff', fillColor: dotColors[markers.length % 3], fillOpacity: 0.8, weight: 2
           });
       marker.addTo(map).bindPopup(cafePopupHtml(cafe), { maxWidth: 200 });
       marker.on('click', () => openDetail(cafe));
@@ -186,17 +167,17 @@
   }
 
   function buildMapLinks(cafe) {
-    let links = '';
-    if (cafe.naverLink) {
-      links += `<a href="${cafe.naverLink}" target="_blank" rel="noopener" class="link-naver">Naver Map</a>`;
-    }
-    if (cafe.lat && cafe.lng) {
-      const kakao = `https://map.kakao.com/link/map/${encodeURIComponent(cafe.nameKr || cafe.name)},${cafe.lat},${cafe.lng}`;
-      const google = `https://www.google.com/maps/search/?api=1&query=${cafe.lat},${cafe.lng}`;
-      links += `<a href="${kakao}" target="_blank" rel="noopener">Kakao Map</a>`;
-      links += `<a href="${google}" target="_blank" rel="noopener">Google Maps</a>`;
-    }
-    return links;
+    const hasCoords = cafe.lat && cafe.lng;
+    const naver = cafe.naverLink
+      ? `<a href="${cafe.naverLink}" target="_blank" rel="noopener" class="link-naver">Naver</a>`
+      : `<span class="link-disabled">Naver</span>`;
+    const kakao = hasCoords
+      ? `<a href="https://map.kakao.com/link/map/${encodeURIComponent(cafe.nameKr || cafe.name)},${cafe.lat},${cafe.lng}" target="_blank" rel="noopener" class="link-kakao">Kakao</a>`
+      : `<span class="link-disabled">Kakao</span>`;
+    const google = hasCoords
+      ? `<a href="https://www.google.com/maps/search/?api=1&query=${cafe.lat},${cafe.lng}" target="_blank" rel="noopener" class="link-google">Google</a>`
+      : `<span class="link-disabled">Google</span>`;
+    return naver + kakao + google;
   }
 
   // ===== Controls =====
@@ -243,8 +224,10 @@
     const query = document.getElementById('search').value.toLowerCase();
     const tag = document.getElementById('tag-filter').value;
     const sort = document.getElementById('sort-by').value;
+    const hasFilters = query || tag || sort !== 'date-desc';
 
-    let filtered = cafes.filter(c => {
+    const source = hasFilters ? cafes : getFeatured();
+    let filtered = source.filter(c => {
       const matchName = c.name.toLowerCase().includes(query) ||
         (c.nameKr && c.nameKr.includes(query));
       const matchTag = !tag || (c.tags && c.tags.includes(tag));
@@ -262,7 +245,7 @@
     });
 
     renderCafes(filtered);
-    addMarkers(filtered);
+    addMarkers(hasFilters ? filtered : cafes);
   }
 
   document.addEventListener('DOMContentLoaded', init);

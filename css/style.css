@@ -88,56 +88,8 @@ a:hover { text-decoration: underline; }
   margin-top: 0.4rem;
 }
 
-/* ===== Featured (overlay on map) ===== */
-.featured {
-  position: absolute;
-  bottom: 0.6rem;
-  left: 2rem;
-  right: 2rem;
-  z-index: 500;
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.featured::-webkit-scrollbar { display: none; }
-.featured:empty { display: none; }
-.featured-item {
-  flex: 0 0 auto;
-  width: 100px;
-  cursor: pointer;
-  overflow: hidden;
-  background: var(--color-surface);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-  transition: transform 0.15s;
-}
-.featured-item:hover { transform: translateY(-2px); }
-.featured-item img {
-  width: 100%;
-  height: 60px;
-  object-fit: cover;
-  display: block;
-}
-.featured-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 60px;
-  background: var(--color-bg);
-  font-size: 1.2rem;
-}
-.featured-name {
-  display: block;
-  padding: 0.25rem 0.4rem;
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* Fix Leaflet divIcon default box */
+.leaflet-div-icon { background: none; border: none; }
 
 /* ===== Map ===== */
 .map-container {
@@ -328,9 +280,29 @@ a:hover { text-decoration: underline; }
   color: var(--bh-black);
   transition: background 0.1s;
 }
-.detail-links a:hover { background: var(--bh-yellow); text-decoration: none; }
+.detail-links a:hover { text-decoration: none; }
 .detail-links .link-naver { background: #03C75A; color: #fff; }
 .detail-links .link-naver:hover { background: #02b351; }
+.detail-links .link-kakao { background: #FEE500; color: #1a1a1a; }
+.detail-links .link-kakao:hover { background: #e6cf00; }
+.detail-links .link-google {
+  background: #fff;
+  background-image: linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.detail-links .link-google:hover { opacity: 0.85; }
+.detail-links .link-disabled {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.4em 0.8em;
+  background: var(--color-bg);
+  color: #bbb;
+  cursor: default;
+}
 #detail-map { height: 200px; margin-top: 1.2rem; }
 
 /* ===== Forms ===== */
@@ -623,7 +595,6 @@ footer {
 @media (max-width: 600px) {
   .site-header { padding: 1.5rem 1rem 1rem; }
   .site-header h1 { font-size: 2rem; }
-  .featured { left: 1rem; right: 1rem; }
   .controls, .map-container { padding: 0 1rem; }
   #map { height: 260px; }
   .cafe-grid { grid-template-columns: 1fr; padding: 0 1rem; }

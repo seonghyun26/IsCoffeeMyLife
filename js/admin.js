@@ -27,7 +27,7 @@
     }
     list.innerHTML = cafes.map(cafe => {
       const thumb = cafe.photos?.length
-        ? `<img src="${cafe.photos[0]}" alt="${cafe.name}">`
+        ? `<img src="${icmlGh.imageUrl(cafe.photos[0])}" alt="${cafe.name}">`
         : '';
       return `
         <div class="admin-list-item" data-id="${cafe.id}">
