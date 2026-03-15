@@ -4,6 +4,7 @@
   'use strict';
 
   let cafes = [];
+  let featuredIds = new Set();
   let map;
   let markers = [];
 
@@ -11,6 +12,7 @@
   async function init() {
     await loadCafes();
     initMap();
+    renderFeatured();
     renderCafes(cafes);
     populateTagFilter();
     bindControls();
@@ -25,14 +27,61 @@
     }
   }
 
+  // ===== Featured =====
+  function renderFeatured() {
+    const section = document.getElementById('featured');
+    if (!cafes.length) return;
+    const shuffled = [...cafes].sort(() => Math.random() - 0.5).slice(0, 10);
+    featuredIds = new Set(shuffled.map(c => c.id));
+    section.innerHTML = shuffled.map(cafe => {
+      const bg = cafe.photos?.length
+        ? `<img src="${cafe.photos[0]}" alt="${cafe.name}" loading="lazy">`
+        : '<span class="featured-icon">☕</span>';
+      return `<div class="featured-item" data-id="${cafe.id}">${bg}<span class="featured-name">${cafe.name}</span></div>`;
+    }).join('');
+    section.querySelectorAll('.featured-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const cafe = cafes.find(c => c.id === item.dataset.id);
+        if (!cafe) return;
+        if (cafe.lat && cafe.lng) {
+          map.setView([cafe.lat, cafe.lng], 15);
+          const marker = markers.find(m => {
+            const ll = m.getLatLng();
+            return ll.lat === cafe.lat && ll.lng === cafe.lng;
+          });
+          if (marker) marker.openPopup();
+        }
+        openDetail(cafe);
+      });
+    });
+  }
+
   // ===== Map =====
   function initMap() {
     map = L.map('map').setView([37.5665, 126.978], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://osm.org/">OSM</a>',
       maxZoom: 19
     }).addTo(map);
     addMarkers(cafes);
+  }
+
+  function cafePin(color) {
+    return L.divIcon({
+      className: '',
+      html: `<svg width="24" height="36" viewBox="0 0 24 36"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill="${color}"/><circle cx="12" cy="12" r="5" fill="#fff"/></svg>`,
+      iconSize: [24, 36],
+      iconAnchor: [12, 36],
+      popupAnchor: [0, -36]
+    });
+  }
+
+  function cafePopupHtml(cafe) {
+    const img = cafe.photos?.length
+      ? `<img src="${cafe.photos[0]}" style="width:100%;height:80px;object-fit:cover;display:block;margin-bottom:6px;">`
+      : '';
+    const stars = cafe.rating ? `<span style="color:#e8b84a;">${renderStars(cafe.rating)}</span> ` : '';
+    return `<div style="min-width:140px;font-family:inherit;">${img}<strong style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.03em;">${cafe.name}</strong><br><span style="font-size:0.75rem;color:#6b6560;">${stars}${cafe.visitDate || ''}</span></div>`;
   }
 
   function addMarkers(list) {
@@ -40,9 +89,13 @@
     markers = [];
     list.forEach(cafe => {
       if (!cafe.lat || !cafe.lng) return;
-      const marker = L.marker([cafe.lat, cafe.lng])
-        .addTo(map)
-        .bindPopup(`<strong>${cafe.name}</strong>`);
+      const isFeatured = featuredIds.has(cafe.id);
+      const marker = isFeatured
+        ? L.marker([cafe.lat, cafe.lng], { icon: cafePin('#e05a4a'), zIndexOffset: 100 })
+        : L.circleMarker([cafe.lat, cafe.lng], {
+            radius: 5, color: '#999', fillColor: '#999', fillOpacity: 0.6, weight: 1
+          });
+      marker.addTo(map).bindPopup(cafePopupHtml(cafe), { maxWidth: 200 });
       marker.on('click', () => openDetail(cafe));
       markers.push(marker);
     });
@@ -124,7 +177,7 @@
     if (cafe.lat && cafe.lng) {
       setTimeout(() => {
         const dm = L.map('detail-map').setView([cafe.lat, cafe.lng], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
           maxZoom: 19
         }).addTo(dm);
         L.marker([cafe.lat, cafe.lng]).addTo(dm);
@@ -135,7 +188,7 @@
   function buildMapLinks(cafe) {
     let links = '';
     if (cafe.naverLink) {
-      links += `<a href="${cafe.naverLink}" target="_blank" rel="noopener">Naver Map</a>`;
+      links += `<a href="${cafe.naverLink}" target="_blank" rel="noopener" class="link-naver">Naver Map</a>`;
     }
     if (cafe.lat && cafe.lng) {
       const kakao = `https://map.kakao.com/link/map/${encodeURIComponent(cafe.nameKr || cafe.name)},${cafe.lat},${cafe.lng}`;

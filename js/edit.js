@@ -65,7 +65,7 @@
   // ===== Map =====
   function initMap() {
     adminMap = L.map('admin-map').setView([37.5665, 126.978], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(adminMap);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(adminMap);
 
     cafes.forEach(cafe => {
       if (!cafe.lat || !cafe.lng) return;
