@@ -101,6 +101,7 @@
 
   async function loginSuccess() {
     document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('admin-header').classList.remove('hidden');
     document.getElementById('editor-section').classList.remove('hidden');
     await loadCafes();
     renderAdminList();
@@ -236,7 +237,7 @@
         <div class="admin-list-item" data-id="${cafe.id}">
           ${thumb}
           <div class="item-info">
-            <h4>${cafe.name}${cafe.nameKr ? ` <span style="font-weight:400">${cafe.nameKr}</span>` : ''}</h4>
+            <h4>${cafe.name}</h4>
             <small>${cafe.visitDate || ''} · ${cafe.rating ? cafe.rating + '/5' : ''}</small>
           </div>
         </div>`;
@@ -280,7 +281,6 @@
       document.getElementById('form-title').textContent = 'Edit Cafe';
       document.getElementById('cafe-id').value = cafe.id;
       document.getElementById('cafe-name').value = cafe.name || '';
-      document.getElementById('cafe-name-kr').value = cafe.nameKr || '';
       document.getElementById('cafe-naver-link').value = cafe.naverLink || '';
       document.getElementById('cafe-date').value = cafe.visitDate || '';
       document.getElementById('cafe-tags').value = (cafe.tags || []).join(', ');
@@ -397,7 +397,6 @@
       const cafe = {
         id,
         name: document.getElementById('cafe-name').value.trim(),
-        nameKr: document.getElementById('cafe-name-kr').value.trim() || undefined,
         naverLink: document.getElementById('cafe-naver-link').value.trim() || undefined,
         lat: selectedLat,
         lng: selectedLng,

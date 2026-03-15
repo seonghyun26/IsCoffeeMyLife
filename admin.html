@@ -3,17 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <title>ICML Admin</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body class="admin-body">
-  <header class="site-header">
-    <div>
-      <h1><a href="index.html">ICML</a> <span class="admin-badge">Admin</span></h1>
-    </div>
-  </header>
-
   <!-- Login (shown before auth) -->
   <section id="login-section" class="admin-login">
     <div class="form-group">
@@ -31,6 +26,12 @@
     <button id="login-btn" class="btn btn-primary">Login</button>
   </section>
 
+  <header id="admin-header" class="site-header hidden">
+    <div>
+      <h1><a href="index.html">ICML</a> <span class="admin-badge">Admin</span></h1>
+    </div>
+  </header>
+
   <!-- Split editor (hidden until login) -->
   <div id="editor-section" class="admin-split hidden">
     <!-- Left: cafe list + form -->
@@ -46,15 +47,9 @@
         <h3 id="form-title">Add New Cafe</h3>
         <form id="cafe-form">
           <input type="hidden" id="cafe-id">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cafe-name">Name (English)</label>
-              <input type="text" id="cafe-name" required>
-            </div>
-            <div class="form-group">
-              <label for="cafe-name-kr">Name (Korean)</label>
-              <input type="text" id="cafe-name-kr">
-            </div>
+          <div class="form-group">
+            <label for="cafe-name">Name</label>
+            <input type="text" id="cafe-name" required>
           </div>
           <div class="form-group">
             <label for="cafe-naver-link">Naver Map Link</label>
