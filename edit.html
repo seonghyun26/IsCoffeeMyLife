@@ -20,12 +20,12 @@
       <p class="subtitle">Is Coffee My Life?</p>
       <span class="admin-badge">Admin</span>
     </div>
-    <nav class="header-nav"><a href="admin.html" class="btn-link">&larr; List</a></nav>
   </header>
 
   <div class="admin-split">
     <!-- Left: form -->
     <div class="admin-left">
+      <a href="admin.html" class="btn-link back-link">&larr; Back to list</a>
       <form id="cafe-form">
         <input type="hidden" id="cafe-id">
         <div class="form-group">
@@ -42,10 +42,7 @@
         <div class="form-row form-row-links">
           <div class="form-group">
             <label for="cafe-naver-link">Naver</label>
-            <div class="input-with-btn">
-              <input type="url" id="cafe-naver-link" placeholder="https://map.naver.com/...">
-              <button type="button" id="naver-search-btn" class="btn-icon" aria-label="Load from link">&#8599;</button>
-            </div>
+            <input type="url" id="cafe-naver-link" placeholder="https://map.naver.com/...">
           </div>
           <div class="form-group">
             <label for="cafe-kakao-link">Kakao</label>

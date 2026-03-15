@@ -25,8 +25,6 @@
       });
     });
 
-    document.getElementById('naver-search-btn').addEventListener('click', parseNaverLink);
-
     // Use current location button
     document.getElementById('use-current-location').addEventListener('click', () => {
       if (!navigator.geolocation) return;
@@ -230,51 +228,6 @@
       btn.disabled = false;
       btn.textContent = 'Save';
     }
-  }
-
-  // ===== Naver Link Parser =====
-  function parseNaverLink() {
-    const url = document.getElementById('cafe-naver-link').value.trim();
-    if (!url) return;
-
-    try {
-      const parsed = new URL(url);
-      const path = decodeURIComponent(parsed.pathname);
-      const searchMatch = path.match(/\/search\/([^/]+)/);
-      if (searchMatch) {
-        const name = document.getElementById('cafe-name');
-        if (!name.value) name.value = searchMatch[1];
-      }
-
-      const c = parsed.searchParams.get('c');
-      if (c) {
-        const [x, y] = c.split(',').map(Number);
-        if (x && y) {
-          if (Math.abs(x) > 180 || Math.abs(y) > 90) {
-            const coords = epsg3857ToWgs84(x, y);
-            setCoordinates(coords.lat, coords.lng);
-          } else {
-            setCoordinates(y, x);
-          }
-          return;
-        }
-      }
-
-      const lat = parseFloat(parsed.searchParams.get('lat') || parsed.searchParams.get('y') || '');
-      const lng = parseFloat(parsed.searchParams.get('lng') || parsed.searchParams.get('x') || '');
-      if (lat && lng) { setCoordinates(lat, lng); return; }
-
-      alert('Could not extract coordinates. Click the map to set location manually.');
-    } catch {
-      alert('Invalid URL.');
-    }
-  }
-
-  function epsg3857ToWgs84(x, y) {
-    const lng = (x / 20037508.34) * 180;
-    let lat = (y / 20037508.34) * 180;
-    lat = (180 / Math.PI) * (2 * Math.atan(Math.exp(lat * Math.PI / 180)) - Math.PI / 2);
-    return { lat, lng };
   }
 
   function setCoordinates(lat, lng) {

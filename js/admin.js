@@ -16,16 +16,24 @@
     });
 
     cafes = await icmlGh.loadCafes();
-    renderList();
+    renderList(cafes);
+
+    document.getElementById('admin-search').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      const filtered = cafes.filter(c =>
+        c.name.toLowerCase().includes(q) || (c.nameKr && c.nameKr.includes(q))
+      );
+      renderList(filtered);
+    });
   }
 
-  function renderList() {
-    const list = document.getElementById('admin-cafe-list');
-    if (!cafes.length) {
-      list.innerHTML = '<p style="color:var(--color-muted);padding:1rem 0;">No cafes yet.</p>';
+  function renderList(items) {
+    const container = document.getElementById('admin-cafe-list');
+    if (!items.length) {
+      container.innerHTML = '<p style="color:var(--color-muted);padding:1rem 0;">No cafes found.</p>';
       return;
     }
-    list.innerHTML = cafes.map(cafe => {
+    container.innerHTML = items.map(cafe => {
       const thumb = cafe.photos?.length
         ? `<img src="${icmlGh.imageUrl(cafe.photos[0])}" alt="${cafe.name}">`
         : '';
@@ -43,14 +51,14 @@
         </div>`;
     }).join('');
 
-    list.querySelectorAll('.admin-list-item').forEach(item => {
+    container.querySelectorAll('.admin-list-item').forEach(item => {
       item.addEventListener('click', e => {
         if (e.target.closest('.list-action-btn.delete')) return;
         window.location.href = `edit.html?id=${item.dataset.id}`;
       });
     });
 
-    list.querySelectorAll('.list-action-btn.delete').forEach(btn => {
+    container.querySelectorAll('.list-action-btn.delete').forEach(btn => {
       btn.addEventListener('click', async e => {
         e.stopPropagation();
         const cafe = cafes.find(c => c.id === btn.dataset.id);
@@ -58,7 +66,7 @@
         try {
           cafes = cafes.filter(c => c.id !== cafe.id);
           await icmlGh.commitFile('data/cafes.json', JSON.stringify(cafes, null, 2) + '\n', `Delete cafe: ${cafe.name}`);
-          renderList();
+          renderList(cafes);
         } catch (err) {
           alert('Delete failed: ' + err.message);
         }
