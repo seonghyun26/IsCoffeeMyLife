@@ -1,10 +1,10 @@
-// hyun — Admin page logic
+// ICML — Admin page logic
 
 (function () {
   'use strict';
 
   let cafes = [];
-  let gh = { owner: '', repo: '', token: '' };
+  const gh = JSON.parse(sessionStorage.getItem('icml_gh') || '{}');
   let adminMap, adminMarker;
   let allMarkers = [];
   let selectedLat = null, selectedLng = null;
@@ -13,21 +13,22 @@
   let isFormMode = false;
 
   // ===== Init =====
-  function init() {
-    const saved = sessionStorage.getItem('icml_gh');
-    if (saved) {
-      gh = JSON.parse(saved);
-      document.getElementById('gh-owner').value = gh.owner;
-      document.getElementById('gh-repo').value = gh.repo;
-      document.getElementById('gh-token').value = gh.token;
-      loginSuccess();
-    }
-    document.getElementById('login-btn').addEventListener('click', handleLogin);
+  async function init() {
+    await loadCafes();
+    renderAdminList();
+    initAdminMap();
+    showAllMarkers();
+
     document.getElementById('add-cafe-btn').addEventListener('click', () => openForm());
     document.getElementById('cafe-form').addEventListener('submit', handleSave);
     document.getElementById('cancel-form-btn').addEventListener('click', closeForm);
     document.getElementById('delete-cafe-btn').addEventListener('click', handleDelete);
-    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      sessionStorage.removeItem('icml_gh');
+      window.location.href = 'login.html';
+    });
 
     // Locate button
     document.getElementById('admin-locate-btn').addEventListener('click', () => {
@@ -79,38 +80,6 @@
 
   function clearRatingButtons(containerId) {
     document.getElementById(containerId).querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-  }
-
-  // ===== GitHub Auth =====
-  async function handleLogin() {
-    gh.owner = document.getElementById('gh-owner').value.trim();
-    gh.repo = document.getElementById('gh-repo').value.trim();
-    gh.token = document.getElementById('gh-token').value.trim();
-    if (!gh.owner || !gh.repo || !gh.token) {
-      alert('Please fill in all fields.');
-      return;
-    }
-    try {
-      const res = await ghApi(`/repos/${gh.owner}/${gh.repo}`);
-      if (!res.ok) throw new Error('Repository not found');
-      sessionStorage.setItem('icml_gh', JSON.stringify(gh));
-      loginSuccess();
-    } catch (err) {
-      alert('Login failed: ' + err.message);
-    }
-  }
-
-  async function loginSuccess() {
-    document.getElementById('login-section').classList.add('hidden');
-    document.getElementById('admin-header').classList.remove('hidden');
-    document.getElementById('editor-section').classList.remove('hidden');
-    await loadCafes();
-    renderAdminList();
-    // Init map after the split layout is visible
-    setTimeout(() => {
-      initAdminMap();
-      showAllMarkers();
-    }, 100);
   }
 
   // ===== GitHub API helpers =====
@@ -302,7 +271,6 @@
         setRatingButton('music-rating-buttons', cafe.musicRating);
       }
 
-      // Show selected pin on map
       if (adminMarker) adminMap.removeLayer(adminMarker);
       if (selectedLat) {
         adminMarker = L.marker([selectedLat, selectedLng], { icon: redIcon() }).addTo(adminMap);
@@ -446,17 +414,6 @@
     } catch (err) {
       alert('Delete failed: ' + err.message);
     }
-  }
-
-  // ===== Logout =====
-  function handleLogout() {
-    sessionStorage.removeItem('icml_gh');
-    gh = { owner: '', repo: '', token: '' };
-    cafes = [];
-    document.getElementById('admin-header').classList.add('hidden');
-    document.getElementById('editor-section').classList.add('hidden');
-    document.getElementById('login-section').classList.remove('hidden');
-    if (adminMap) { adminMap.remove(); adminMap = null; }
   }
 
   // ===== Utils =====

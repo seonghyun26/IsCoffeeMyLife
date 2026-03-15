@@ -7,34 +7,22 @@
   <title>ICML Admin</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script>
+    // Auth guard — redirect to login if not authenticated
+    if (!sessionStorage.getItem('icml_gh')) {
+      window.location.href = 'login.html';
+    }
+  </script>
 </head>
 <body class="admin-body">
-  <!-- Login (shown before auth) -->
-  <section id="login-section" class="admin-login">
-    <div class="form-group">
-      <label for="gh-owner">GitHub Owner</label>
-      <input type="text" id="gh-owner" placeholder="username">
-    </div>
-    <div class="form-group">
-      <label for="gh-repo">Repository</label>
-      <input type="text" id="gh-repo" value="icml">
-    </div>
-    <div class="form-group">
-      <label for="gh-token">Personal Access Token</label>
-      <input type="password" id="gh-token" placeholder="ghp_...">
-    </div>
-    <button id="login-btn" class="btn btn-primary">Login</button>
-  </section>
-
-  <header id="admin-header" class="site-header hidden">
+  <header class="site-header">
     <div>
       <h1><a href="index.html">ICML</a> <span class="admin-badge">Admin</span></h1>
     </div>
     <nav class="header-nav"><button id="logout-btn" class="btn-link">Logout</button></nav>
   </header>
 
-  <!-- Split editor (hidden until login) -->
-  <div id="editor-section" class="admin-split hidden">
+  <div id="editor-section" class="admin-split">
     <!-- Left: cafe list + form -->
     <div class="admin-left">
       <div class="admin-left-header">

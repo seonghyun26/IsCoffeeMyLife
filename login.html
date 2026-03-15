@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>ICML Login</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <h1><a href="index.html">ICML</a></h1>
+    </div>
+  </header>
+
+  <section class="admin-login">
+    <div class="form-group">
+      <label for="gh-token">Personal Access Token</label>
+      <input type="password" id="gh-token" placeholder="ghp_...">
+    </div>
+    <button id="login-btn" class="btn btn-primary">Login</button>
+  </section>
+
+  <script>
+    (function () {
+      var owner = 'seonghyun26';
+      var repo = 'IsCoffeeMyLife';
+
+      if (sessionStorage.getItem('icml_gh')) {
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      document.getElementById('login-btn').addEventListener('click', async function () {
+        var token = document.getElementById('gh-token').value.trim();
+        if (!token) return;
+
+        try {
+          var res = await fetch('https://api.github.com/repos/' + owner + '/' + repo, {
+            headers: {
+              Authorization: 'Bearer ' + token,
+              Accept: 'application/vnd.github.v3+json'
+            }
+          });
+          if (!res.ok) throw new Error('Authentication failed');
+          sessionStorage.setItem('icml_gh', JSON.stringify({ owner: owner, repo: repo, token: token }));
+          window.location.href = 'admin.html';
+        } catch (err) {
+          alert('Login failed: ' + err.message);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
