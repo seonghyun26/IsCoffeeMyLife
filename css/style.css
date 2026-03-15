@@ -105,7 +105,7 @@ a:hover { color: var(--bh-black); }
   padding: 0 2rem;
   position: relative;
 }
-#map { height: 50vh; min-height: 300px; }
+#map { height: 70vh; min-height: 400px; }
 
 .map-container,
 .admin-right { position: relative; }
@@ -614,7 +614,7 @@ footer {
   .site-header { padding: 1.5rem 1rem 1rem; }
   .site-header h1 { font-size: 2rem; }
   .controls, .map-container { padding: 0 1rem; }
-  #map { height: 40vh; min-height: 220px; }
+  #map { height: 50vh; min-height: 280px; }
   .cafe-grid { grid-template-columns: 1fr; padding: 0 1rem; }
   .form-row { flex-direction: column; gap: 0; }
   .admin-split { flex-direction: column; }

@@ -28,7 +28,8 @@
   }
 
   function pickFeatured() {
-    const shuffled = [...cafes].sort(() => Math.random() - 0.5).slice(0, 10);
+    const withLocation = cafes.filter(c => c.lat && c.lng);
+    const shuffled = [...withLocation].sort(() => Math.random() - 0.5).slice(0, 10);
     featuredIds = new Set(shuffled.map(c => c.id));
   }
 
@@ -43,7 +44,7 @@
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://osm.org/">OSM</a>',
       maxZoom: 19
     }).addTo(map);
-    addMarkers(cafes);
+    addMarkers(getFeatured());
   }
 
   function cafePin(color) {
