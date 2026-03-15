@@ -6,9 +6,11 @@
   let cafes = [];
   let gh = { owner: '', repo: '', token: '' };
   let adminMap, adminMarker;
+  let allMarkers = [];
   let selectedLat = null, selectedLng = null;
-  let pendingPhotos = []; // { file, dataUrl }
-  let existingPhotos = []; // urls of already-uploaded photos
+  let pendingPhotos = [];
+  let existingPhotos = [];
+  let isFormMode = false;
 
   // ===== Init =====
   function init() {
@@ -24,14 +26,7 @@
     document.getElementById('add-cafe-btn').addEventListener('click', () => openForm());
     document.getElementById('cafe-form').addEventListener('submit', handleSave);
     document.getElementById('cafe-photos').addEventListener('change', handlePhotoSelect);
-
-    // Close modals
-    document.querySelectorAll('.modal-close').forEach(btn => {
-      btn.addEventListener('click', () => btn.closest('.modal').classList.add('hidden'));
-    });
-    document.getElementById('cafe-form-modal').addEventListener('click', e => {
-      if (e.target.classList.contains('modal')) e.target.classList.add('hidden');
-    });
+    document.getElementById('cancel-form-btn').addEventListener('click', closeForm);
     document.getElementById('delete-cafe-btn').addEventListener('click', handleDelete);
   }
 
@@ -59,6 +54,7 @@
     document.getElementById('editor-section').classList.remove('hidden');
     await loadCafes();
     renderAdminList();
+    initAdminMap();
   }
 
   // ===== GitHub API helpers =====
@@ -115,43 +111,109 @@
     await commitFile('data/cafes.json', json, message);
   }
 
+  // ===== Map =====
+  function initAdminMap() {
+    const container = document.getElementById('admin-map');
+    adminMap = L.map(container).setView([37.5665, 126.978], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(adminMap);
+    showAllMarkers();
+
+    adminMap.on('click', e => {
+      if (!isFormMode) return;
+      selectedLat = Math.round(e.latlng.lat * 1e6) / 1e6;
+      selectedLng = Math.round(e.latlng.lng * 1e6) / 1e6;
+      if (adminMarker) adminMap.removeLayer(adminMarker);
+      adminMarker = L.marker([selectedLat, selectedLng], { icon: redIcon() }).addTo(adminMap);
+      updateCoordsDisplay();
+    });
+  }
+
+  function redIcon() {
+    return L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:var(--bh-red,#e05a4a);border:2px solid #1a1a1a;border-radius:50%;"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+  }
+
+  function showAllMarkers() {
+    allMarkers.forEach(m => adminMap.removeLayer(m));
+    allMarkers = [];
+    cafes.forEach(cafe => {
+      if (!cafe.lat || !cafe.lng) return;
+      const marker = L.marker([cafe.lat, cafe.lng])
+        .addTo(adminMap)
+        .bindPopup(`<strong>${cafe.name}</strong>`);
+      marker.on('click', () => {
+        selectCafeOnList(cafe.id);
+        panToMarker(cafe);
+      });
+      allMarkers.push(marker);
+    });
+    if (allMarkers.length) {
+      adminMap.fitBounds(L.featureGroup(allMarkers).getBounds().pad(0.15));
+    }
+  }
+
+  function panToMarker(cafe) {
+    if (cafe.lat && cafe.lng) {
+      adminMap.setView([cafe.lat, cafe.lng], 15);
+    }
+  }
+
+  function updateCoordsDisplay() {
+    document.getElementById('coords-display').textContent =
+      selectedLat ? `선택된 좌표: ${selectedLat}, ${selectedLng}` : '선택된 좌표: 없음';
+  }
+
   // ===== Admin list =====
   function renderAdminList() {
-    const grid = document.getElementById('admin-cafe-list');
+    const list = document.getElementById('admin-cafe-list');
     if (!cafes.length) {
-      grid.innerHTML = '<p style="color:var(--color-text-light);">아직 카페가 없습니다.</p>';
+      list.innerHTML = '<p style="color:var(--color-text-light);padding:1rem 0;">아직 카페가 없습니다.</p>';
       return;
     }
-    grid.innerHTML = cafes.map(cafe => {
+    list.innerHTML = cafes.map(cafe => {
       const thumb = cafe.photos && cafe.photos.length
         ? `<img src="${cafe.photos[0]}" alt="${cafe.name}">`
-        : '<div class="no-photo">☕</div>';
+        : '';
       return `
-        <div class="cafe-card" data-id="${cafe.id}">
+        <div class="admin-list-item" data-id="${cafe.id}">
           ${thumb}
-          <div class="card-body">
-            <h3>${cafe.name}</h3>
-            <div class="card-meta">${cafe.visitDate || ''}</div>
+          <div class="item-info">
+            <h4>${cafe.name}${cafe.nameKr ? ` <span style="font-weight:400">${cafe.nameKr}</span>` : ''}</h4>
+            <small>${cafe.visitDate || ''} · ${cafe.rating ? cafe.rating + '/5' : ''}</small>
           </div>
         </div>`;
     }).join('');
 
-    grid.querySelectorAll('.cafe-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const cafe = cafes.find(c => c.id === card.dataset.id);
-        if (cafe) openForm(cafe);
+    list.querySelectorAll('.admin-list-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const cafe = cafes.find(c => c.id === item.dataset.id);
+        if (cafe) {
+          openForm(cafe);
+          panToMarker(cafe);
+        }
       });
+    });
+  }
+
+  function selectCafeOnList(id) {
+    document.querySelectorAll('.admin-list-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.id === id);
     });
   }
 
   // ===== Form =====
   function openForm(cafe = null) {
-    const modal = document.getElementById('cafe-form-modal');
+    const section = document.getElementById('cafe-form-section');
     const form = document.getElementById('cafe-form');
     form.reset();
     pendingPhotos = [];
     existingPhotos = [];
     document.getElementById('photo-preview').innerHTML = '';
+    isFormMode = true;
 
     if (cafe) {
       document.getElementById('form-title').textContent = '카페 수정';
@@ -169,46 +231,32 @@
       existingPhotos = cafe.photos ? [...cafe.photos] : [];
       renderPhotoPreview();
       document.getElementById('delete-cafe-btn').classList.remove('hidden');
+      selectCafeOnList(cafe.id);
+
+      // Show selected pin on map
+      if (adminMarker) adminMap.removeLayer(adminMarker);
+      if (selectedLat) {
+        adminMarker = L.marker([selectedLat, selectedLng], { icon: redIcon() }).addTo(adminMap);
+      }
     } else {
       document.getElementById('form-title').textContent = '새 카페 추가';
       document.getElementById('cafe-id').value = '';
       selectedLat = null;
       selectedLng = null;
       document.getElementById('delete-cafe-btn').classList.add('hidden');
+      if (adminMarker) { adminMap.removeLayer(adminMarker); adminMarker = null; }
     }
 
-    modal.classList.remove('hidden');
-
-    // Init admin map after modal is visible
-    setTimeout(() => initAdminMap(), 100);
+    updateCoordsDisplay();
+    section.classList.remove('hidden');
+    section.scrollIntoView({ behavior: 'smooth' });
   }
 
-  function initAdminMap() {
-    const container = document.getElementById('admin-map');
-    if (adminMap) { adminMap.remove(); adminMap = null; }
-
-    const center = selectedLat ? [selectedLat, selectedLng] : [37.5665, 126.978];
-    const zoom = selectedLat ? 15 : 11;
-    adminMap = L.map(container).setView(center, zoom);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(adminMap);
-
-    if (selectedLat) {
-      adminMarker = L.marker(center).addTo(adminMap);
-      updateCoordsDisplay();
-    }
-
-    adminMap.on('click', e => {
-      selectedLat = Math.round(e.latlng.lat * 1e6) / 1e6;
-      selectedLng = Math.round(e.latlng.lng * 1e6) / 1e6;
-      if (adminMarker) adminMap.removeLayer(adminMarker);
-      adminMarker = L.marker([selectedLat, selectedLng]).addTo(adminMap);
-      updateCoordsDisplay();
-    });
-  }
-
-  function updateCoordsDisplay() {
-    document.getElementById('coords-display').textContent =
-      selectedLat ? `선택된 좌표: ${selectedLat}, ${selectedLng}` : '선택된 좌표: 없음';
+  function closeForm() {
+    document.getElementById('cafe-form-section').classList.add('hidden');
+    isFormMode = false;
+    if (adminMarker) { adminMap.removeLayer(adminMarker); adminMarker = null; }
+    document.querySelectorAll('.admin-list-item').forEach(i => i.classList.remove('active'));
   }
 
   // ===== Photos =====
@@ -246,7 +294,6 @@
       const id = document.getElementById('cafe-id').value || generateId();
       const isNew = !document.getElementById('cafe-id').value;
 
-      // Upload new photos
       const uploadedPhotos = [];
       for (const p of pendingPhotos) {
         const ext = p.file.name.split('.').pop().toLowerCase();
@@ -281,8 +328,9 @@
       }
 
       await saveCafes(isNew ? `Add cafe: ${cafe.name}` : `Update cafe: ${cafe.name}`);
-      document.getElementById('cafe-form-modal').classList.add('hidden');
+      closeForm();
       renderAdminList();
+      showAllMarkers();
       alert('저장 완료!');
     } catch (err) {
       alert('저장 실패: ' + err.message);
@@ -301,8 +349,9 @@
     try {
       cafes = cafes.filter(c => c.id !== id);
       await saveCafes(`Delete cafe: ${cafe.name}`);
-      document.getElementById('cafe-form-modal').classList.add('hidden');
+      closeForm();
       renderAdminList();
+      showAllMarkers();
       alert('삭제 완료!');
     } catch (err) {
       alert('삭제 실패: ' + err.message);

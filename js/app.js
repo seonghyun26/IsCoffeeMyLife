@@ -160,6 +160,21 @@
     document.getElementById('tag-filter').addEventListener('change', applyFilters);
     document.getElementById('sort-by').addEventListener('change', applyFilters);
 
+    // Current location
+    document.getElementById('locate-btn').addEventListener('click', () => {
+      if (!navigator.geolocation) return alert('이 브라우저에서는 위치 서비스를 사용할 수 없습니다.');
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude, longitude } = pos.coords;
+          map.setView([latitude, longitude], 14);
+          L.circleMarker([latitude, longitude], {
+            radius: 8, color: '#c45142', fillColor: '#c45142', fillOpacity: 0.9, weight: 2
+          }).addTo(map).bindPopup('현재 위치').openPopup();
+        },
+        () => alert('위치를 가져올 수 없습니다.')
+      );
+    });
+
     // Close modal
     document.getElementById('modal').addEventListener('click', e => {
       if (e.target.classList.contains('modal') || e.target.classList.contains('modal-close')) {

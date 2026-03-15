@@ -9,13 +9,22 @@
 </head>
 <body>
   <header class="site-header">
-    <h1>ICML</h1>
-    <p class="subtitle">Is Coffee My Life?</p>
+    <div>
+      <h1>ICML</h1>
+      <p class="subtitle">Is Coffee My Life?</p>
+    </div>
+    <nav class="header-nav"><a href="admin.html">Admin</a></nav>
   </header>
 
   <main>
+    <!-- Map -->
+    <section class="map-container">
+      <div id="map"></div>
+    </section>
+
     <!-- Controls -->
     <section class="controls">
+      <button id="locate-btn" class="btn btn-locate" aria-label="Current location">&#9678; 현재 위치</button>
       <input type="text" id="search" placeholder="카페 이름 검색..." aria-label="Search cafes">
       <select id="tag-filter" aria-label="Filter by tag">
         <option value="">모든 태그</option>
@@ -26,11 +35,6 @@
         <option value="rating-desc">별점 높은순</option>
         <option value="rating-asc">별점 낮은순</option>
       </select>
-    </section>
-
-    <!-- Map -->
-    <section class="map-container">
-      <div id="map"></div>
     </section>
 
     <!-- Cafe grid -->
@@ -46,7 +50,7 @@
   </div>
 
   <footer>
-    <p>&copy; ICML</p>
+    <p>&copy; ICML &middot; <a href="https://seonghyun26.github.io/hyun/">Seonghyun</a> &middot; <a href="https://github.com/seonghyun26/IsCoffeeMyLife">GitHub</a> &middot; <a href="admin.html">Admin</a></p>
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
