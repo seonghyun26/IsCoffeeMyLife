@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICML Admin</title>
+  <title>hyun Admin</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body class="admin-body">
   <header class="site-header">
     <div>
-      <h1><a href="index.html">ICML</a> <span class="admin-badge">Admin</span></h1>
+      <h1><a href="index.html">hyun</a> <span class="admin-badge">Admin</span></h1>
     </div>
   </header>
 
   <!-- Login (shown before auth) -->
   <section id="login-section" class="admin-login">
-    <h2>GitHub 로그인</h2>
-    <p>저장소에 데이터를 커밋하려면 GitHub Personal Access Token이 필요합니다.</p>
+    <h2>GitHub Login</h2>
+    <p>A GitHub Personal Access Token is required to commit data to the repository.</p>
     <div class="form-group">
       <label for="gh-owner">GitHub Owner</label>
       <input type="text" id="gh-owner" placeholder="username">
@@ -30,7 +30,7 @@
       <label for="gh-token">Personal Access Token</label>
       <input type="password" id="gh-token" placeholder="ghp_...">
     </div>
-    <button id="login-btn" class="btn btn-primary">로그인</button>
+    <button id="login-btn" class="btn btn-primary">Login</button>
   </section>
 
   <!-- Split editor (hidden until login) -->
@@ -38,65 +38,89 @@
     <!-- Left: cafe list + form -->
     <div class="admin-left">
       <div class="admin-left-header">
-        <h2>카페 목록</h2>
-        <button id="add-cafe-btn" class="btn btn-primary">+ 추가</button>
+        <h2>Cafes</h2>
+        <button id="add-cafe-btn" class="btn-icon" aria-label="Add cafe">+</button>
       </div>
       <div id="admin-cafe-list" class="admin-list"></div>
 
       <!-- Inline form (hidden until add/edit) -->
       <div id="cafe-form-section" class="admin-form hidden">
-        <h3 id="form-title">새 카페 추가</h3>
+        <h3 id="form-title">Add New Cafe</h3>
         <form id="cafe-form">
           <input type="hidden" id="cafe-id">
           <div class="form-row">
             <div class="form-group">
-              <label for="cafe-name">이름 (English)</label>
+              <label for="cafe-name">Name (English)</label>
               <input type="text" id="cafe-name" required>
             </div>
             <div class="form-group">
-              <label for="cafe-name-kr">이름 (한국어)</label>
+              <label for="cafe-name-kr">Name (Korean)</label>
               <input type="text" id="cafe-name-kr">
             </div>
           </div>
           <div class="form-group">
-            <label for="cafe-address">주소</label>
-            <input type="text" id="cafe-address">
+            <label for="cafe-naver-link">Naver Map Link</label>
+            <input type="url" id="cafe-naver-link" placeholder="https://naver.me/...">
           </div>
           <div class="form-group">
-            <label>위치 — 오른쪽 지도를 클릭하세요</label>
-            <small id="coords-display">선택된 좌표: 없음</small>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cafe-date">방문 날짜</label>
-              <input type="date" id="cafe-date" required>
-            </div>
-            <div class="form-group">
-              <label for="cafe-rating">전체 별점 (1-5)</label>
-              <input type="number" id="cafe-rating" min="1" max="5" step="0.5" required>
-            </div>
-            <div class="form-group">
-              <label for="cafe-music-rating">음악 별점 (1-5)</label>
-              <input type="number" id="cafe-music-rating" min="1" max="5" step="0.5">
-            </div>
+            <label>Location &mdash; click the map on the right</label>
+            <small id="coords-display">Selected coordinates: none</small>
           </div>
           <div class="form-group">
-            <label for="cafe-tags">태그 (쉼표로 구분)</label>
+            <label for="cafe-date">Visit Date</label>
+            <input type="date" id="cafe-date" required>
+          </div>
+          <div class="form-group">
+            <label>Overall Rating</label>
+            <div class="rating-buttons" id="rating-buttons">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="1.5">1.5</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="2.5">2.5</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="3.5">3.5</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="4.5">4.5</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+            <input type="hidden" id="cafe-rating">
+          </div>
+          <div class="form-group">
+            <label>Music Rating</label>
+            <div class="rating-buttons" id="music-rating-buttons">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="1.5">1.5</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="2.5">2.5</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="3.5">3.5</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="4.5">4.5</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+            <input type="hidden" id="cafe-music-rating">
+          </div>
+          <div class="form-group">
+            <label for="cafe-tags">Tags (comma-separated)</label>
             <input type="text" id="cafe-tags" placeholder="jazz, vinyl, quiet, good-for-reading">
           </div>
           <div class="form-group">
-            <label for="cafe-description">설명 / 메모</label>
+            <label for="cafe-description">Notes</label>
             <textarea id="cafe-description" rows="3"></textarea>
           </div>
           <div class="form-group">
-            <label for="cafe-photos">사진 업로드</label>
-            <input type="file" id="cafe-photos" accept="image/*" multiple>
+            <label>Photos</label>
+            <div id="photo-upload-area" class="photo-upload-area">
+              <span class="upload-icon">+</span>
+              <span>Drop images or click to upload</span>
+              <input type="file" id="cafe-photos" accept="image/*" multiple>
+            </div>
             <div id="photo-preview" class="photo-preview"></div>
           </div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">저장</button>
-            <button type="button" id="cancel-form-btn" class="btn">취소</button>
-            <button type="button" id="delete-cafe-btn" class="btn btn-danger hidden">삭제</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" id="cancel-form-btn" class="btn">Cancel</button>
+            <button type="button" id="delete-cafe-btn" class="btn btn-danger hidden">Delete</button>
           </div>
         </form>
       </div>

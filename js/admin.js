@@ -1,4 +1,4 @@
-// ICML — Admin page logic
+// hyun — Admin page logic
 
 (function () {
   'use strict';
@@ -14,6 +14,8 @@
 
   // ===== Init =====
   function init() {
+    initAdminMap();
+
     const saved = sessionStorage.getItem('icml_gh');
     if (saved) {
       gh = JSON.parse(saved);
@@ -25,9 +27,47 @@
     document.getElementById('login-btn').addEventListener('click', handleLogin);
     document.getElementById('add-cafe-btn').addEventListener('click', () => openForm());
     document.getElementById('cafe-form').addEventListener('submit', handleSave);
-    document.getElementById('cafe-photos').addEventListener('change', handlePhotoSelect);
     document.getElementById('cancel-form-btn').addEventListener('click', closeForm);
     document.getElementById('delete-cafe-btn').addEventListener('click', handleDelete);
+
+    // Photo upload
+    const uploadArea = document.getElementById('photo-upload-area');
+    const fileInput = document.getElementById('cafe-photos');
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadArea.classList.remove('drag-over');
+      handleFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+    });
+    fileInput.addEventListener('change', e => handleFiles(Array.from(e.target.files)));
+
+    // Rating buttons
+    initRatingButtons('rating-buttons', 'cafe-rating');
+    initRatingButtons('music-rating-buttons', 'cafe-music-rating');
+  }
+
+  function initRatingButtons(containerId, hiddenId) {
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById(hiddenId).value = btn.dataset.value;
+      });
+    });
+  }
+
+  function setRatingButton(containerId, value) {
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('button').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.value === String(value));
+    });
+  }
+
+  function clearRatingButtons(containerId) {
+    document.getElementById(containerId).querySelectorAll('button').forEach(b => b.classList.remove('selected'));
   }
 
   // ===== GitHub Auth =====
@@ -36,7 +76,7 @@
     gh.repo = document.getElementById('gh-repo').value.trim();
     gh.token = document.getElementById('gh-token').value.trim();
     if (!gh.owner || !gh.repo || !gh.token) {
-      alert('모든 필드를 입력해주세요.');
+      alert('Please fill in all fields.');
       return;
     }
     try {
@@ -45,7 +85,7 @@
       sessionStorage.setItem('icml_gh', JSON.stringify(gh));
       loginSuccess();
     } catch (err) {
-      alert('로그인 실패: ' + err.message);
+      alert('Login failed: ' + err.message);
     }
   }
 
@@ -54,7 +94,9 @@
     document.getElementById('editor-section').classList.remove('hidden');
     await loadCafes();
     renderAdminList();
-    initAdminMap();
+    showAllMarkers();
+    // Re-invalidate map size after layout change
+    setTimeout(() => adminMap.invalidateSize(), 200);
   }
 
   // ===== GitHub API helpers =====
@@ -116,7 +158,6 @@
     const container = document.getElementById('admin-map');
     adminMap = L.map(container).setView([37.5665, 126.978], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(adminMap);
-    showAllMarkers();
 
     adminMap.on('click', e => {
       if (!isFormMode) return;
@@ -131,7 +172,7 @@
   function redIcon() {
     return L.divIcon({
       className: '',
-      html: '<div style="width:14px;height:14px;background:var(--bh-red,#e05a4a);border:2px solid #1a1a1a;border-radius:50%;"></div>',
+      html: '<div style="width:14px;height:14px;background:#e05a4a;border:2px solid #1a1a1a;border-radius:50%;"></div>',
       iconSize: [14, 14],
       iconAnchor: [7, 7]
     });
@@ -164,14 +205,14 @@
 
   function updateCoordsDisplay() {
     document.getElementById('coords-display').textContent =
-      selectedLat ? `선택된 좌표: ${selectedLat}, ${selectedLng}` : '선택된 좌표: 없음';
+      selectedLat ? `Selected: ${selectedLat}, ${selectedLng}` : 'Selected coordinates: none';
   }
 
   // ===== Admin list =====
   function renderAdminList() {
     const list = document.getElementById('admin-cafe-list');
     if (!cafes.length) {
-      list.innerHTML = '<p style="color:var(--color-text-light);padding:1rem 0;">아직 카페가 없습니다.</p>';
+      list.innerHTML = '<p style="color:var(--color-text-light);padding:1rem 0;">No cafes yet.</p>';
       return;
     }
     list.innerHTML = cafes.map(cafe => {
@@ -213,17 +254,22 @@
     pendingPhotos = [];
     existingPhotos = [];
     document.getElementById('photo-preview').innerHTML = '';
+    document.getElementById('cafe-rating').value = '';
+    document.getElementById('cafe-music-rating').value = '';
+    clearRatingButtons('rating-buttons');
+    clearRatingButtons('music-rating-buttons');
     isFormMode = true;
 
+    // Default date to today
+    document.getElementById('cafe-date').value = new Date().toISOString().slice(0, 10);
+
     if (cafe) {
-      document.getElementById('form-title').textContent = '카페 수정';
+      document.getElementById('form-title').textContent = 'Edit Cafe';
       document.getElementById('cafe-id').value = cafe.id;
       document.getElementById('cafe-name').value = cafe.name || '';
       document.getElementById('cafe-name-kr').value = cafe.nameKr || '';
-      document.getElementById('cafe-address').value = cafe.address || '';
+      document.getElementById('cafe-naver-link').value = cafe.naverLink || '';
       document.getElementById('cafe-date').value = cafe.visitDate || '';
-      document.getElementById('cafe-rating').value = cafe.rating || '';
-      document.getElementById('cafe-music-rating').value = cafe.musicRating || '';
       document.getElementById('cafe-tags').value = (cafe.tags || []).join(', ');
       document.getElementById('cafe-description').value = cafe.description || '';
       selectedLat = cafe.lat || null;
@@ -233,13 +279,22 @@
       document.getElementById('delete-cafe-btn').classList.remove('hidden');
       selectCafeOnList(cafe.id);
 
+      if (cafe.rating) {
+        document.getElementById('cafe-rating').value = cafe.rating;
+        setRatingButton('rating-buttons', cafe.rating);
+      }
+      if (cafe.musicRating) {
+        document.getElementById('cafe-music-rating').value = cafe.musicRating;
+        setRatingButton('music-rating-buttons', cafe.musicRating);
+      }
+
       // Show selected pin on map
       if (adminMarker) adminMap.removeLayer(adminMarker);
       if (selectedLat) {
         adminMarker = L.marker([selectedLat, selectedLng], { icon: redIcon() }).addTo(adminMap);
       }
     } else {
-      document.getElementById('form-title').textContent = '새 카페 추가';
+      document.getElementById('form-title').textContent = 'Add New Cafe';
       document.getElementById('cafe-id').value = '';
       selectedLat = null;
       selectedLng = null;
@@ -260,9 +315,9 @@
   }
 
   // ===== Photos =====
-  function handlePhotoSelect(e) {
-    const files = Array.from(e.target.files);
+  function handleFiles(files) {
     files.forEach(file => {
+      if (!file.type.startsWith('image/')) return;
       const reader = new FileReader();
       reader.onload = () => {
         pendingPhotos.push({ file, dataUrl: reader.result });
@@ -272,15 +327,36 @@
     });
   }
 
+  function removePhoto(type, index) {
+    if (type === 'existing') {
+      existingPhotos.splice(index, 1);
+    } else {
+      pendingPhotos.splice(index, 1);
+    }
+    renderPhotoPreview();
+  }
+
   function renderPhotoPreview() {
     const container = document.getElementById('photo-preview');
-    const existingHtml = existingPhotos.map(url =>
-      `<img src="${url}" alt="photo">`
+    const existingHtml = existingPhotos.map((url, i) =>
+      `<div class="photo-thumb">
+        <img src="${url}" alt="photo">
+        <button type="button" class="photo-remove" data-type="existing" data-index="${i}">&times;</button>
+      </div>`
     ).join('');
-    const pendingHtml = pendingPhotos.map(p =>
-      `<img src="${p.dataUrl}" alt="new photo">`
+    const pendingHtml = pendingPhotos.map((p, i) =>
+      `<div class="photo-thumb">
+        <img src="${p.dataUrl}" alt="new photo">
+        <button type="button" class="photo-remove" data-type="pending" data-index="${i}">&times;</button>
+      </div>`
     ).join('');
     container.innerHTML = existingHtml + pendingHtml;
+
+    container.querySelectorAll('.photo-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        removePhoto(btn.dataset.type, parseInt(btn.dataset.index));
+      });
+    });
   }
 
   // ===== Save =====
@@ -288,19 +364,20 @@
     e.preventDefault();
     const btn = e.target.querySelector('[type="submit"]');
     btn.disabled = true;
-    btn.textContent = '저장 중...';
+    btn.textContent = 'Saving...';
 
     try {
       const id = document.getElementById('cafe-id').value || generateId();
       const isNew = !document.getElementById('cafe-id').value;
 
       const uploadedPhotos = [];
+      const cafeHash = await hashString(id);
       for (const p of pendingPhotos) {
         const ext = p.file.name.split('.').pop().toLowerCase();
-        const filename = `${id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.${ext}`;
-        const path = `images/${filename}`;
+        const filename = `${Date.now()}_${Math.random().toString(36).slice(2, 6)}.${ext}`;
+        const path = `images/${cafeHash}/${filename}`;
         const base64 = p.dataUrl.split(',')[1];
-        await commitFile(path, base64, `Add photo: ${filename}`, true);
+        await commitFile(path, base64, `Add photo: ${cafeHash}/${filename}`, true);
         uploadedPhotos.push(path);
       }
 
@@ -308,7 +385,7 @@
         id,
         name: document.getElementById('cafe-name').value.trim(),
         nameKr: document.getElementById('cafe-name-kr').value.trim() || undefined,
-        address: document.getElementById('cafe-address').value.trim() || undefined,
+        naverLink: document.getElementById('cafe-naver-link').value.trim() || undefined,
         lat: selectedLat,
         lng: selectedLng,
         visitDate: document.getElementById('cafe-date').value,
@@ -331,12 +408,12 @@
       closeForm();
       renderAdminList();
       showAllMarkers();
-      alert('저장 완료!');
+      alert('Saved!');
     } catch (err) {
-      alert('저장 실패: ' + err.message);
+      alert('Save failed: ' + err.message);
     } finally {
       btn.disabled = false;
-      btn.textContent = '저장';
+      btn.textContent = 'Save';
     }
   }
 
@@ -344,7 +421,7 @@
   async function handleDelete() {
     const id = document.getElementById('cafe-id').value;
     const cafe = cafes.find(c => c.id === id);
-    if (!cafe || !confirm(`"${cafe.name}" 카페를 삭제하시겠습니까?`)) return;
+    if (!cafe || !confirm(`Delete "${cafe.name}"?`)) return;
 
     try {
       cafes = cafes.filter(c => c.id !== id);
@@ -352,15 +429,21 @@
       closeForm();
       renderAdminList();
       showAllMarkers();
-      alert('삭제 완료!');
+      alert('Deleted!');
     } catch (err) {
-      alert('삭제 실패: ' + err.message);
+      alert('Delete failed: ' + err.message);
     }
   }
 
   // ===== Utils =====
   function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  async function hashString(str) {
+    const data = new TextEncoder().encode(str);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 8);
   }
 
   document.addEventListener('DOMContentLoaded', init);

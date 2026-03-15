@@ -1,4 +1,4 @@
-// ICML — Public page logic
+// hyun — Public page logic
 
 (function () {
   'use strict';
@@ -133,14 +133,17 @@
   }
 
   function buildMapLinks(cafe) {
-    if (!cafe.lat || !cafe.lng) return '';
-    const naver = `https://map.naver.com/v5/search/${encodeURIComponent(cafe.nameKr || cafe.name)}`;
-    const kakao = `https://map.kakao.com/link/map/${encodeURIComponent(cafe.nameKr || cafe.name)},${cafe.lat},${cafe.lng}`;
-    const google = `https://www.google.com/maps/search/?api=1&query=${cafe.lat},${cafe.lng}`;
-    return `
-      <a href="${naver}" target="_blank" rel="noopener">네이버 지도</a>
-      <a href="${kakao}" target="_blank" rel="noopener">카카오맵</a>
-      <a href="${google}" target="_blank" rel="noopener">Google Maps</a>`;
+    let links = '';
+    if (cafe.naverLink) {
+      links += `<a href="${cafe.naverLink}" target="_blank" rel="noopener">Naver Map</a>`;
+    }
+    if (cafe.lat && cafe.lng) {
+      const kakao = `https://map.kakao.com/link/map/${encodeURIComponent(cafe.nameKr || cafe.name)},${cafe.lat},${cafe.lng}`;
+      const google = `https://www.google.com/maps/search/?api=1&query=${cafe.lat},${cafe.lng}`;
+      links += `<a href="${kakao}" target="_blank" rel="noopener">Kakao Map</a>`;
+      links += `<a href="${google}" target="_blank" rel="noopener">Google Maps</a>`;
+    }
+    return links;
   }
 
   // ===== Controls =====
