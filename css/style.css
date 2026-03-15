@@ -1,25 +1,16 @@
-/* =============================================
-   hyun — Bauhaus Design System
-   ============================================= */
+/* hyun — Bauhaus Design System */
 
-/* ===== Palette ===== */
 :root {
   --bh-red: #e05a4a;
   --bh-blue: #4a8ab5;
   --bh-yellow: #e8b84a;
   --bh-black: #1a1a1a;
   --bh-white: #f7f5f0;
-
   --color-bg: #edeae4;
   --color-surface: var(--bh-white);
   --color-text: var(--bh-black);
-  --color-text-light: #6b6560;
+  --color-muted: #6b6560;
   --color-accent: var(--bh-blue);
-  --color-accent-hover: #3a7299;
-  --color-danger: var(--bh-red);
-  --color-highlight: var(--bh-yellow);
-
-  --radius: 0px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +24,18 @@ body {
 
 a { color: var(--color-accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* Shared heading style */
+.section-title,
+.admin-left-header h2,
+.admin-section h2,
+.admin-login h2,
+.admin-form h3,
+.detail-info h2 {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
 /* ===== Header ===== */
 .site-header {
@@ -64,12 +67,9 @@ a:hover { text-decoration: underline; }
   color: var(--bh-black);
   line-height: 1;
 }
-.site-header h1 a {
-  color: inherit;
-  text-decoration: none;
-}
+.site-header h1 a { color: inherit; text-decoration: none; }
 .site-header .subtitle {
-  color: var(--color-text-light);
+  color: var(--color-muted);
   font-size: 0.95rem;
   font-weight: 400;
   letter-spacing: 0.04em;
@@ -91,10 +91,31 @@ a:hover { text-decoration: underline; }
   max-width: 960px;
   margin: 0 auto 1rem;
   padding: 0 2rem;
+  position: relative;
 }
-#map {
-  height: 380px;
+#map { height: 380px; }
+
+.map-container,
+.admin-right { position: relative; }
+.map-locate-btn {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 500;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: var(--color-surface);
+  color: var(--bh-black);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.1s;
 }
+.map-locate-btn:hover { color: var(--bh-blue); }
+.map-container .map-locate-btn { right: 2.6rem; }
 
 /* ===== Controls ===== */
 .controls {
@@ -123,35 +144,6 @@ a:hover { text-decoration: underline; }
   border-bottom-color: var(--bh-yellow);
 }
 
-/* ===== Map Locate Button ===== */
-.map-container,
-.admin-right {
-  position: relative;
-}
-.map-locate-btn {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 500;
-  width: 2.2rem;
-  height: 2.2rem;
-  border: none;
-  background: var(--bh-black);
-  color: var(--bh-white);
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.1s;
-}
-.map-locate-btn:hover {
-  background: var(--bh-blue);
-}
-.map-container .map-locate-btn {
-  right: 2.75rem;
-}
-
 /* ===== Cafe Grid ===== */
 .cafe-grid {
   display: grid;
@@ -161,26 +153,20 @@ a:hover { text-decoration: underline; }
   margin: 0 auto 3rem;
   padding: 0 2rem;
 }
-
 .cafe-card {
   background: var(--color-surface);
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.15s;
-  position: relative;
 }
-.cafe-card:hover {
-  transform: translateY(-3px);
-}
+.cafe-card:hover { transform: translateY(-3px); }
 .cafe-card img {
   width: 100%;
   height: 200px;
   object-fit: cover;
   display: block;
 }
-.cafe-card .card-body {
-  padding: 1rem 1.1rem;
-}
+.cafe-card .card-body { padding: 1rem 1.1rem; }
 .cafe-card .card-body h3 {
   font-size: 1rem;
   font-weight: 800;
@@ -188,9 +174,9 @@ a:hover { text-decoration: underline; }
   letter-spacing: 0.03em;
   margin-bottom: 0.25rem;
 }
-.cafe-card .card-body .card-meta {
+.cafe-card .card-meta {
   font-size: 0.8rem;
-  color: var(--color-text-light);
+  color: var(--color-muted);
 }
 .cafe-card .tags {
   display: flex;
@@ -198,6 +184,8 @@ a:hover { text-decoration: underline; }
   gap: 0.4rem;
   margin-top: 0.6rem;
 }
+
+/* Tags & Stars */
 .tag {
   font-size: 0.7rem;
   font-weight: 700;
@@ -210,7 +198,6 @@ a:hover { text-decoration: underline; }
 .tag:nth-child(3n+2) { background: var(--bh-blue); }
 .tag:nth-child(3n+3) { background: var(--bh-red); }
 
-/* ===== Stars ===== */
 .stars {
   color: var(--bh-yellow);
   letter-spacing: 2px;
@@ -238,26 +225,20 @@ a:hover { text-decoration: underline; }
   padding: 2rem;
   position: relative;
 }
-.modal-wide { max-width: 720px; }
 .modal-close {
   position: absolute;
   top: 0.6rem;
   right: 0.8rem;
-  background: var(--bh-black);
+  background: none;
   border: none;
-  color: var(--bh-white);
-  font-size: 1.2rem;
-  width: 2rem;
-  height: 2rem;
+  color: var(--color-muted);
+  font-size: 1.4rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   line-height: 1;
 }
-.modal-close:hover { background: var(--bh-red); }
+.modal-close:hover { color: var(--bh-red); }
 
-/* ===== Detail Modal ===== */
+/* Detail modal */
 .detail-gallery {
   display: flex;
   gap: 2px;
@@ -269,14 +250,9 @@ a:hover { text-decoration: underline; }
   object-fit: cover;
   flex-shrink: 0;
 }
-.detail-info h2 {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.2rem;
-}
+.detail-info h2 { margin-bottom: 0.2rem; }
 .detail-info .kr-name {
-  color: var(--color-text-light);
+  color: var(--color-muted);
   margin-bottom: 0.8rem;
   font-size: 1rem;
 }
@@ -299,30 +275,11 @@ a:hover { text-decoration: underline; }
   color: var(--bh-black);
   transition: background 0.1s;
 }
-.detail-links a:hover {
-  background: var(--bh-yellow);
-  text-decoration: none;
-}
-#detail-map {
-  height: 200px;
-  margin-top: 1.2rem;
-}
+.detail-links a:hover { background: var(--bh-yellow); text-decoration: none; }
+#detail-map { height: 200px; margin-top: 1.2rem; }
 
-/* ===== Forms (admin) ===== */
-.admin-section {
-  max-width: 720px;
-  margin: 0 auto 2rem;
-  padding: 0 2rem;
-}
-.admin-section h2 {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 1rem;
-}
-.form-group {
-  margin-bottom: 1.1rem;
-}
+/* ===== Forms ===== */
+.form-group { margin-bottom: 1.1rem; }
 .form-group label {
   display: block;
   font-weight: 700;
@@ -338,7 +295,6 @@ a:hover { text-decoration: underline; }
   padding: 0.6rem 0.75rem;
   border: none;
   border-bottom: 2px solid var(--bh-black);
-  border-radius: var(--radius);
   font-size: 0.9rem;
   font-family: inherit;
   background: transparent;
@@ -353,25 +309,19 @@ a:hover { text-decoration: underline; }
   border: 2px solid var(--color-bg);
   background: var(--color-surface);
 }
-.form-group textarea:focus {
-  border-color: var(--bh-yellow);
-}
+.form-group textarea:focus { border-color: var(--bh-yellow); }
 .form-group small {
   display: block;
   margin-top: 0.3rem;
-  color: var(--color-text-light);
+  color: var(--color-muted);
   font-size: 0.8rem;
 }
-.form-row {
-  display: flex;
-  gap: 1rem;
-}
+.input-with-btn { display: flex; align-items: center; gap: 0; }
+.input-with-btn input, .input-with-btn small { flex: 1; }
+.input-with-btn .btn-icon { flex-shrink: 0; }
+.form-row { display: flex; gap: 1rem; }
 .form-row .form-group { flex: 1; }
-.form-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
+.form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
 
 /* ===== Buttons ===== */
 .btn {
@@ -387,28 +337,15 @@ a:hover { text-decoration: underline; }
   background: var(--color-bg);
   color: var(--bh-black);
 }
-.btn:hover {
-  background: var(--bh-yellow);
-}
-.btn-primary {
-  background: var(--bh-black);
-  color: var(--bh-white);
-}
-.btn-primary:hover {
-  background: var(--bh-blue);
-}
-.btn-danger {
-  background: transparent;
-  color: var(--bh-red);
-}
-.btn-danger:hover {
-  background: var(--bh-red);
-  color: var(--bh-white);
-}
+.btn:hover { background: var(--bh-yellow); }
+.btn-primary { background: var(--bh-black); color: var(--bh-white); }
+.btn-primary:hover { background: var(--bh-blue); }
+.btn-danger { background: transparent; color: var(--bh-red); }
+.btn-danger:hover { background: var(--bh-red); color: var(--bh-white); }
 .btn-link {
   background: none;
   border: none;
-  color: var(--color-text-light);
+  color: var(--color-muted);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -416,15 +353,13 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   font-family: inherit;
 }
-.btn-link:hover {
-  color: var(--bh-red);
-}
+.btn-link:hover { color: var(--bh-red); }
 .btn-icon {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2rem;
+  height: 2rem;
   border: none;
-  background: var(--bh-black);
-  color: var(--bh-white);
+  background: none;
+  color: var(--bh-black);
   font-size: 1.4rem;
   font-weight: 700;
   cursor: pointer;
@@ -432,18 +367,27 @@ a:hover { text-decoration: underline; }
   align-items: center;
   justify-content: center;
   line-height: 1;
-  transition: background 0.1s;
+  transition: color 0.1s;
 }
-.btn-icon:hover {
-  background: var(--bh-blue);
-}
+.btn-icon:hover { color: var(--bh-blue); }
 
 /* ===== Rating Buttons ===== */
-.rating-buttons {
+.rating-row {
   display: flex;
-  gap: 4px;
+  gap: 1.5rem;
+  margin-bottom: 1.1rem;
   flex-wrap: wrap;
 }
+.rating-group { display: flex; align-items: center; gap: 0.5rem; }
+.rating-icon {
+  font-size: 1.3rem;
+  cursor: default;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.rating-icon:hover { opacity: 1; }
+.rating-group:has(.rating-buttons .selected) .rating-icon { opacity: 1; }
+.rating-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
 .rating-buttons button {
   width: 2.4rem;
   height: 2rem;
@@ -455,13 +399,8 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   transition: background 0.1s;
 }
-.rating-buttons button:hover {
-  background: var(--bh-yellow);
-}
-.rating-buttons button.selected {
-  background: var(--bh-black);
-  color: var(--bh-white);
-}
+.rating-buttons button:hover { background: var(--bh-yellow); }
+.rating-buttons button.selected { background: var(--bh-black); color: var(--bh-white); }
 
 /* ===== Photo Upload ===== */
 .photo-upload-area {
@@ -471,16 +410,14 @@ a:hover { text-decoration: underline; }
   justify-content: center;
   gap: 0.4rem;
   padding: 1.5rem;
-  border: 2px dashed var(--color-text-light);
+  border: 2px dashed var(--color-muted);
   background: var(--color-surface);
   cursor: pointer;
   transition: background 0.1s;
   position: relative;
 }
 .photo-upload-area:hover,
-.photo-upload-area.drag-over {
-  background: var(--bh-yellow);
-}
+.photo-upload-area.drag-over { background: var(--bh-yellow); }
 .photo-upload-area .upload-icon {
   font-size: 1.8rem;
   font-weight: 900;
@@ -491,7 +428,7 @@ a:hover { text-decoration: underline; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-text-light);
+  color: var(--color-muted);
 }
 .photo-upload-area input[type="file"] {
   position: absolute;
@@ -501,32 +438,22 @@ a:hover { text-decoration: underline; }
   width: 100%;
   height: 100%;
 }
-
-/* ===== Photo Preview ===== */
 .photo-preview {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   margin-top: 0.75rem;
 }
-.photo-thumb {
-  position: relative;
-  display: inline-block;
-}
-.photo-thumb img {
-  height: 80px;
-  width: 80px;
-  object-fit: cover;
-  display: block;
-}
+.photo-thumb { position: relative; display: inline-block; }
+.photo-thumb img { height: 80px; width: 80px; object-fit: cover; display: block; }
 .photo-remove {
   position: absolute;
   top: 2px;
   right: 2px;
-  width: 1.4rem;
-  height: 1.4rem;
-  background: var(--bh-black);
-  color: var(--bh-white);
+  width: 1.2rem;
+  height: 1.2rem;
+  background: rgba(255,255,255,0.8);
+  color: var(--color-muted);
   border: none;
   font-size: 0.9rem;
   cursor: pointer;
@@ -535,49 +462,34 @@ a:hover { text-decoration: underline; }
   justify-content: center;
   line-height: 1;
 }
-.photo-remove:hover {
-  background: var(--bh-red);
-}
-
+.photo-remove:hover { color: var(--bh-red); }
 .no-photo {
   height: 200px;
   background: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-light);
+  color: var(--color-muted);
   font-size: 1.5rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-/* ===== Admin Split Layout ===== */
+/* ===== Admin Layout ===== */
 .admin-body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
-.admin-body .site-header {
-  max-width: none;
-  justify-content: center;
-}
+.admin-body .site-header { max-width: none; justify-content: center; }
 .admin-login {
   max-width: 420px;
   margin: 2rem auto;
   padding: 0 2rem;
 }
-.admin-login h2 {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 1rem;
-}
-.admin-split {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
+.admin-login h2 { margin-bottom: 1rem; }
+.admin-split { display: flex; flex: 1; overflow: hidden; }
 .admin-left {
   width: 50%;
   overflow-y: auto;
@@ -590,18 +502,8 @@ a:hover { text-decoration: underline; }
   align-items: center;
   margin-bottom: 1rem;
 }
-.admin-left-header h2 {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 1.2rem;
-}
-.admin-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
+.admin-left-header h2 { font-size: 1.2rem; }
+.admin-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
 .admin-list-item {
   display: flex;
   align-items: center;
@@ -612,14 +514,11 @@ a:hover { text-decoration: underline; }
   transition: background 0.1s;
 }
 .admin-list-item:hover,
-.admin-list-item.active {
-  background: var(--bh-yellow);
-}
-.admin-list-item img {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  flex-shrink: 0;
+.admin-list-item.active { background: var(--bh-yellow); }
+.admin-list-item img { width: 48px; height: 48px; object-fit: cover; flex-shrink: 0; }
+.admin-list-item .item-info {
+  flex: 1;
+  min-width: 0;
 }
 .admin-list-item .item-info h4 {
   font-size: 0.9rem;
@@ -627,28 +526,32 @@ a:hover { text-decoration: underline; }
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-.admin-list-item .item-info small {
-  color: var(--color-text-light);
-  font-size: 0.75rem;
+.admin-list-item .item-info small { color: var(--color-muted); font-size: 0.75rem; }
+.admin-list-item .list-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
-.admin-form {
-  padding-top: 1.5rem;
-  border-top: 2px solid var(--bh-black);
+.admin-db { max-width: 640px; margin: 0 auto; padding: 0 2rem 2rem; }
+.list-action-btn {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.1s;
 }
-.admin-form h3 {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 1rem;
-}
-.admin-right {
-  width: 50%;
-  position: relative;
-}
-.admin-right #admin-map {
-  position: absolute;
-  inset: 0;
-}
+.list-action-btn:hover { color: var(--bh-blue); }
+.list-action-btn.delete:hover { color: var(--bh-red); }
+.admin-form { padding-top: 1.5rem; border-top: 2px solid var(--bh-black); }
+.admin-form h3 { margin-bottom: 1rem; }
+.admin-right { width: 50%; }
+.admin-right #admin-map { position: absolute; inset: 0; }
 
 /* ===== Footer ===== */
 footer {
@@ -656,7 +559,7 @@ footer {
   margin: 0 auto;
   text-align: center;
   padding: 1.5rem 2rem;
-  color: var(--color-text-light);
+  color: var(--color-muted);
   font-size: 0.8rem;
   letter-spacing: 0.04em;
 }
@@ -665,13 +568,9 @@ footer {
 @media (max-width: 600px) {
   .site-header { padding: 1.5rem 1rem 1rem; }
   .site-header h1 { font-size: 2rem; }
-  .controls { padding: 0 1rem; }
-  .map-container { padding: 0 1rem; }
+  .controls, .map-container { padding: 0 1rem; }
   #map { height: 260px; }
-  .cafe-grid {
-    grid-template-columns: 1fr;
-    padding: 0 1rem;
-  }
+  .cafe-grid { grid-template-columns: 1fr; padding: 0 1rem; }
   .form-row { flex-direction: column; gap: 0; }
   .admin-split { flex-direction: column; }
   .admin-left { width: 100%; border-right: none; border-bottom: 2px solid var(--bh-black); }

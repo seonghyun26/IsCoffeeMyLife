@@ -6,15 +6,13 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <title>ICML Admin</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script>
-    // Auth guard — redirect to login if not authenticated
     if (!sessionStorage.getItem('icml_gh')) {
       window.location.href = 'login.html';
     }
   </script>
 </head>
-<body class="admin-body">
+<body>
   <header class="site-header">
     <div>
       <h1><a href="index.html">ICML</a> <span class="admin-badge">Admin</span></h1>
@@ -22,92 +20,15 @@
     <nav class="header-nav"><button id="logout-btn" class="btn-link">Logout</button></nav>
   </header>
 
-  <div id="editor-section" class="admin-split">
-    <!-- Left: cafe list + form -->
-    <div class="admin-left">
-      <div class="admin-left-header">
-        <h2>Cafes</h2>
-        <button id="add-cafe-btn" class="btn-icon" aria-label="Add cafe">+</button>
-      </div>
-      <div id="admin-cafe-list" class="admin-list"></div>
-
-      <!-- Inline form (hidden until add/edit) -->
-      <div id="cafe-form-section" class="admin-form hidden">
-        <h3 id="form-title">Add New Cafe</h3>
-        <form id="cafe-form">
-          <input type="hidden" id="cafe-id">
-          <div class="form-group">
-            <label for="cafe-name">Name</label>
-            <input type="text" id="cafe-name" required>
-          </div>
-          <div class="form-group">
-            <label for="cafe-naver-link">Naver Map Link</label>
-            <input type="url" id="cafe-naver-link" placeholder="https://naver.me/...">
-          </div>
-          <div class="form-group">
-            <label>Location &mdash; click the map on the right</label>
-            <small id="coords-display">Selected coordinates: none</small>
-          </div>
-          <div class="form-group">
-            <label for="cafe-date">Visit Date</label>
-            <input type="date" id="cafe-date" required>
-          </div>
-          <div class="form-group">
-            <label>Overall Rating</label>
-            <div class="rating-buttons" id="rating-buttons">
-              <button type="button" data-value="1">1</button>
-              <button type="button" data-value="2">2</button>
-              <button type="button" data-value="3">3</button>
-              <button type="button" data-value="4">4</button>
-              <button type="button" data-value="5">5</button>
-            </div>
-            <input type="hidden" id="cafe-rating">
-          </div>
-          <div class="form-group">
-            <label>Music Rating</label>
-            <div class="rating-buttons" id="music-rating-buttons">
-              <button type="button" data-value="1">1</button>
-              <button type="button" data-value="2">2</button>
-              <button type="button" data-value="3">3</button>
-              <button type="button" data-value="4">4</button>
-              <button type="button" data-value="5">5</button>
-            </div>
-            <input type="hidden" id="cafe-music-rating">
-          </div>
-          <div class="form-group">
-            <label for="cafe-tags">Tags (comma-separated)</label>
-            <input type="text" id="cafe-tags" placeholder="jazz, vinyl, quiet, good-for-reading">
-          </div>
-          <div class="form-group">
-            <label for="cafe-description">Notes</label>
-            <textarea id="cafe-description" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Photos</label>
-            <div id="photo-upload-area" class="photo-upload-area">
-              <span class="upload-icon">+</span>
-              <span>Drop images or click to upload</span>
-              <input type="file" id="cafe-photos" accept="image/*" multiple>
-            </div>
-            <div id="photo-preview" class="photo-preview"></div>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <button type="button" id="cancel-form-btn" class="btn">Cancel</button>
-            <button type="button" id="delete-cafe-btn" class="btn btn-danger hidden">Delete</button>
-          </div>
-        </form>
-      </div>
+  <section class="admin-db">
+    <div class="admin-left-header">
+      <h2>Cafes</h2>
+      <button id="add-cafe-btn" class="btn-icon" aria-label="Add cafe">+</button>
     </div>
+    <div id="admin-cafe-list" class="admin-list"></div>
+  </section>
 
-    <!-- Right: interactive map -->
-    <div class="admin-right">
-      <div id="admin-map"></div>
-      <button id="admin-locate-btn" class="map-locate-btn" aria-label="Current location">&#9678;</button>
-    </div>
-  </div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/gh.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>

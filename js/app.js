@@ -56,7 +56,7 @@
   function renderCafes(list) {
     const grid = document.getElementById('cafe-grid');
     if (!list.length) {
-      grid.innerHTML = '<p style="text-align:center;color:var(--color-text-light);grid-column:1/-1;">등록된 카페가 없습니다.</p>';
+      grid.innerHTML = '<p style="text-align:center;color:var(--color-text-light);grid-column:1/-1;">No cafes yet.</p>';
       return;
     }
     grid.innerHTML = list.map(cafe => {
@@ -110,7 +110,7 @@
         <h2>${cafe.name}</h2>
         ${cafe.nameKr ? `<p class="kr-name">${cafe.nameKr}</p>` : ''}
         <p><span class="stars">${renderStars(cafe.rating)}</span> ${cafe.rating || '-'} / 5
-          ${cafe.musicRating ? ` &middot; 음악 ${renderStars(cafe.musicRating)} ${cafe.musicRating}` : ''}</p>
+          ${cafe.musicRating ? ` &middot; Music ${renderStars(cafe.musicRating)} ${cafe.musicRating}` : ''}</p>
         <p>📅 ${cafe.visitDate || '-'}</p>
         ${cafe.address ? `<p>📍 ${cafe.address}</p>` : ''}
         ${cafe.description ? `<p>${cafe.description}</p>` : ''}
@@ -165,16 +165,16 @@
 
     // Current location
     document.getElementById('locate-btn').addEventListener('click', () => {
-      if (!navigator.geolocation) return alert('이 브라우저에서는 위치 서비스를 사용할 수 없습니다.');
+      if (!navigator.geolocation) return alert('Geolocation not supported.');
       navigator.geolocation.getCurrentPosition(
         pos => {
           const { latitude, longitude } = pos.coords;
           map.setView([latitude, longitude], 14);
           L.circleMarker([latitude, longitude], {
             radius: 8, color: '#c45142', fillColor: '#c45142', fillOpacity: 0.9, weight: 2
-          }).addTo(map).bindPopup('현재 위치').openPopup();
+          }).addTo(map).bindPopup('Current location').openPopup();
         },
-        () => alert('위치를 가져올 수 없습니다.')
+        () => alert('Could not get location.')
       );
     });
 
