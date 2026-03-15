@@ -167,6 +167,7 @@
 
   // ===== Map =====
   function initAdminMap() {
+    if (adminMap) return;
     const container = document.getElementById('admin-map');
     adminMap = L.map(container).setView([37.5665, 126.978], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(adminMap);
